@@ -1,13 +1,13 @@
 /**
  *******************************************************************************
  * @file    shell_port_stm32g4.c
- * @brief   Xifeng Shell STM32G4系列移植层实现
+ * @brief   Shell STM32G4系列移植层实现
  * @details 此文件实现了Shell移植层接口，适用于STM32G4系列MCU。
  *          如需移植到其他STM32系列，可参考此文件创建对应的移植文件。
  *
  * @version 2.0
  * @date    2024
- * @author  Xifeng Shell Team
+ * @author  Shell Team
  *
  * @note    【移植说明】
  *          1. 此文件依赖STM32 HAL库

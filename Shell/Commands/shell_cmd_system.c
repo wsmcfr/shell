@@ -1,7 +1,7 @@
 /**
  *******************************************************************************
  * @file    shell_cmd_system.c
- * @brief   Xifeng Shell 系统命令模块
+ * @brief   Shell 系统命令模块
  * @details 此文件实现系统相关的Shell命令，包括：
  *          - reboot: 系统复位
  *          - uptime: 显示运行时间
@@ -11,7 +11,7 @@
  *
  * @version 2.0
  * @date    2024
- * @author  Xifeng Shell Team
+ * @author  Shell Team
  *******************************************************************************
  */
 

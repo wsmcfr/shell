@@ -1,14 +1,14 @@
 /**
  *******************************************************************************
  * @file    shell_commands.h
- * @brief   Xifeng Shell 命令模块头文件
+ * @brief   Shell 命令模块头文件
  * @details 此文件提供所有命令模块的统一接口，包括：
  *          - 命令模块初始化函数声明
  *          - 命令模块注册的统一入口
  *
  * @version 2.0
  * @date    2024
- * @author  Xifeng Shell Team
+ * @author  Shell Team
  *
  * @note    使用方法：
  *          1. 在shell_init()之后调用shell_commands_init()

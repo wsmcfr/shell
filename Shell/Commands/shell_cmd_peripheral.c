@@ -1,7 +1,7 @@
 /**
  *******************************************************************************
  * @file    shell_cmd_peripheral.c
- * @brief   Xifeng Shell 外设命令模块
+ * @brief   Shell 外设命令模块
  * @details 此文件实现外设相关的Shell命令，包括：
  *          - adc:     读取ADC值
  *          - pwm:     设置PWM输出
@@ -12,7 +12,7 @@
  *
  * @version 2.0
  * @date    2024
- * @author  Xifeng Shell Team
+ * @author  Shell Team
  *******************************************************************************
  */
 

@@ -1,7 +1,7 @@
 /**
  *******************************************************************************
  * @file    shell_cmd_gpio.c
- * @brief   Xifeng Shell GPIO命令模块
+ * @brief   Shell GPIO命令模块
  * @details 此文件实现GPIO相关的Shell命令，包括：
  *          - gpio:   控制GPIO引脚电平
  *          - read:   读取GPIO引脚状态
@@ -11,7 +11,7 @@
  *
  * @version 2.0
  * @date    2024
- * @author  Xifeng Shell Team
+ * @author  Shell Team
  *******************************************************************************
  */
 

@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>STM32_Xifeng</TargetName>
+      <TargetName>shell_project_instance</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060960::V5.06 update 7 (build 960)::.\ARMCC</pCCUsed>
@@ -48,8 +48,8 @@
             <NotGenerated>0</NotGenerated>
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
-          <OutputDirectory>STM32_Xifeng\</OutputDirectory>
-          <OutputName>STM32_Xifeng</OutputName>
+          <OutputDirectory>shell_project_instance\</OutputDirectory>
+          <OutputName>shell_project_instance</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -1291,7 +1291,7 @@
   <LayerInfo>
     <Layers>
       <Layer>
-        <LayName>STM32_Xifeng</LayName>
+        <LayName>shell_project_instance</LayName>
         <LayPrjMark>1</LayPrjMark>
       </Layer>
     </Layers>

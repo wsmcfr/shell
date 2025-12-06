@@ -2,6 +2,7 @@
 MDK-ARM/DebugConfig/
 MDK-ARM/*.uvoptx
 MDK-ARM/*.uvguix.*
+MDK-ARM/shell_project_instance/
 MDK-ARM/STM32_Xifeng/
 MDK-ARM/*.bak
 MDK-ARM/*.dep

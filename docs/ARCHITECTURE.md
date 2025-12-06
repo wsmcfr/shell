@@ -1,4 +1,4 @@
-# Xifeng Shell 可移植架构设计文档
+# Shell 可移植架构设计文档
 
 ## 一、现有架构分析
 
@@ -87,7 +87,7 @@
 
 ```
                     ┌──────────────────────────────────────┐
-                    │        Xifeng Shell v2.0             │
+                    │          Shell v2.0                  │
                     │         可移植架构设计                │
                     └──────────────────┬───────────────────┘
                                        │
@@ -276,7 +276,7 @@ void shell_port_reboot(void) {
 ## 五、文件结构
 
 ```
-STM32_Xifeng/
+shell_project/
 ├── Shell/                          # Shell核心模块 (平台无关)
 │   ├── Core/                       # 核心实现
 │   │   ├── shell_core.c           # Shell主逻辑

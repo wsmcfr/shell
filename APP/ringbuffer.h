@@ -9,7 +9,7 @@
  *
  * @version 1.0
  * @date    2024
- * @author  Xifeng Shell Team
+ * @author  Shell Team
  *
  * @par 环形缓冲区工作原理:
  *      环形缓冲区使用一个固定大小的数组，通过读指针(r)和写指针(w)

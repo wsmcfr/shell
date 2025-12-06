@@ -1,4 +1,4 @@
-# Xifeng Shell v2.0
+# Shell v2.0
 
 一个轻量级、可移植的嵌入式Shell命令行系统，专为STM32系列MCU设计。
 
@@ -33,7 +33,7 @@
 ## 目录结构
 
 ```
-STM32_Xifeng/
+shell_project/
 ├── Shell/                      # Shell模块（可移植）
 │   ├── Core/                   # 核心实现（平台无关）
 │   │   ├── shell_core.c
@@ -79,7 +79,7 @@ GND       -->  GND
 ### 4. 运行效果
 ```
 ======================================
-    Xifeng Shell v2.0
+    Shell v2.0
     Build: Dec  6 2024 10:30:00
     Type 'help' for commands
 ======================================

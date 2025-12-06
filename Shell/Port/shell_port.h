@@ -1,13 +1,13 @@
 /**
  *******************************************************************************
  * @file    shell_port.h
- * @brief   Xifeng Shell 移植层接口定义
+ * @brief   Shell 移植层接口定义
  * @details 此文件定义了Shell移植层必须实现的所有接口函数。
  *          移植到新平台时，需要实现shell_port_xxx.c中的这些函数。
  *
  * @version 2.0
  * @date    2024
- * @author  Xifeng Shell Team
+ * @author  Shell Team
  *
  * @note    【移植指南】
  *          1. 复制此头文件到目标工程

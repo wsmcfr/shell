@@ -8,7 +8,7 @@
  *
  * @version 1.0
  * @date    2024
- * @author  Xifeng Shell Team
+ * @author  Shell Team
  *
  * @par 设计说明:
  *      - 使用itemCount记录数据量，避免读写指针相等时的歧义

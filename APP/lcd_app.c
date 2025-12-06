@@ -12,10 +12,10 @@
  *
  * @version 2.0
  * @date    2024
- * @author  Xifeng Shell Team
+ * @author  Shell Team
  *
  * @par LCD布局 (320x240, 10行):
- *      Line0: ═══ Xifeng Shell v2.0 ═══  (标题栏-蓝底白字)
+ *      Line0: ═══ Shell v2.0 ═══         (标题栏-蓝底白字)
  *      Line1: 时间: HH:MM:SS  日期: MM-DD (时间显示)
  *      Line2: ─────────────────────────  (分隔线)
  *      Line3: > [当前Shell命令]          (命令显示-绿色)
@@ -67,7 +67,7 @@ static void lcd_draw_title(void)
 {
     LCD_SetBackColor(Blue);
     LCD_SetTextColor(White);
-    LcdSprintf(Line0, "  Xifeng Shell v2.0 ");
+    LcdSprintf(Line0, "    Shell v2.0      ");
     LCD_SetBackColor(Black);
 }
 

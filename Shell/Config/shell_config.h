@@ -1,13 +1,13 @@
 /**
  *******************************************************************************
  * @file    shell_config.h
- * @brief   Xifeng Shell 配置文件
+ * @brief   Shell 配置文件
  * @details 此文件包含Shell的所有可配置选项，用户可以根据实际需求修改这些配置
  *          来裁剪功能或调整参数。
  *
  * @version 2.0
  * @date    2024
- * @author  Xifeng Shell Team
+ * @author  Shell Team
  *
  * @note    移植到新平台时，只需修改此配置文件和对应的shell_port_xxx.c即可
  *******************************************************************************
@@ -34,7 +34,7 @@ extern "C" {
 /**
  * @brief Shell名称和构建信息
  */
-#define SHELL_NAME              "Xifeng Shell"
+#define SHELL_NAME              "Shell"
 #define SHELL_VERSION_STRING    "v2.0.0"
 
 /*===========================================================================*/
@@ -112,7 +112,7 @@ extern "C" {
 /**
  * @brief Shell提示符字符串
  * @note  可自定义提示符，支持颜色转义序列
- *        示例: "> ", "shell> ", "\033[32mxifeng>\033[0m "
+ *        示例: "> ", "shell> ", "\033[32mshell>\033[0m "
  */
 #define SHELL_PROMPT                    "> "
 

@@ -8,7 +8,7 @@
  *
  * @version 1.0
  * @date    2024
- * @author  Xifeng Shell Team
+ * @author  Shell Team
  *
  * @par 调度器工作原理:
  *      1. 每个任务定义执行周期（毫秒）

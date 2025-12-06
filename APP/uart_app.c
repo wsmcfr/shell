@@ -6,7 +6,7 @@
  *
  * @version 2.0
  * @date    2024
- * @author  Xifeng Shell Team
+ * @author  Shell Team
  *
  * @note    使用新的Shell v2.0模块，原有Shell代码已移除
  *******************************************************************************
