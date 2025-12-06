@@ -24,6 +24,8 @@
 #include "rtc_app.h"
 #include "tim_app.h"
 #include "ringbuffer.h"
+#include "i2c_hal.h"
+#include "persist.h"
 
 extern uint16_t uart_rx_index;          // 接收缓冲区索引
 extern uint32_t uart_rx_ticks;          // 接收缓冲时间戳

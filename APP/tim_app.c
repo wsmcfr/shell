@@ -45,6 +45,34 @@ uint32_t tim_ic_val = 0;// 最终计算得到的输入捕获值
 uint32_t tim_ic_temp = 0;// 临时存储输入捕获的中间值
 
 /**
+ * @brief 获取当前PWM占空比
+ *
+ * @return 占空比，范围为0.0到100.0
+ */
+float pwm_get_duty(void)
+{
+    if (TIM2->ARR == 0) {
+        return 0.0f;
+    }
+    return (float)TIM2->CCR2 / (float)(TIM2->ARR + 1) * 100.0f;
+}
+
+/**
+ * @brief 获取当前PWM频率
+ *
+ * @return 频率，单位为Hz
+ */
+int pwm_get_frequency(void)
+{
+    uint32_t TIM2_CLK = 72000000;  // 与pwm_set_frequency保持一致
+
+    if (TIM2->ARR == 0) {
+        return 0;
+    }
+    return (int)(TIM2_CLK / (TIM2->ARR + 1));
+}
+
+/**
  * @brief 处理输入捕获数据
  *
  * 此函数用于处理输入捕获数据。它计算tim_ic_buffer数组中捕获值的平均值，

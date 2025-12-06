@@ -114,6 +114,8 @@ int main(void)
   LCD_SetTextColor(White);
   LCD_SetBackColor(Black);
 
+  persist_init();         /* 初始化掉电保存模块，恢复保存的数据 */
+
   shell_init();           /* 初始化Shell核心 */
   shell_commands_init();  /* 注册所有Shell命令 */
   scheduler_init();

@@ -19,6 +19,9 @@
 #include "shell_core.h"
 #include "shell_port.h"
 #include "shell_config.h"
+#include "persist.h"
+#include "tim_app.h"
+#include "rtc.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -29,6 +32,12 @@
 
 /* 用户可设置的全局变量 */
 extern int vara, varb, varc;
+
+/* LED状态数组 */
+extern uint8_t ucLed[8];
+
+/* RTC */
+extern RTC_HandleTypeDef hrtc;
 
 /*===========================================================================*/
 /*                              adc 命令实现                                   */
@@ -384,6 +393,127 @@ static void shell_cmd_paraset(void)
 #endif /* SHELL_CMD_PARASET_ENABLE */
 
 /*===========================================================================*/
+/*                              save 命令实现                                  */
+/*===========================================================================*/
+
+#if SHELL_CMD_SAVE_ENABLE
+/**
+ * @brief   save命令处理函数
+ * @details 保存当前系统数据到EEPROM
+ *
+ * @par 使用方法:
+ *      save
+ *
+ * @par 保存内容:
+ *      - LED状态
+ *      - 用户变量 (vara, varb, varc)
+ *      - PWM设置 (占空比、频率)
+ */
+static void shell_cmd_save(void)
+{
+    RTC_TimeTypeDef rtc_time;
+    RTC_DateTypeDef rtc_date;
+
+    shell_printf("Saving data to EEPROM...\r\n");
+
+    /* 获取当前RTC时间 */
+    HAL_RTC_GetTime(&hrtc, &rtc_time, RTC_FORMAT_BIN);
+    HAL_RTC_GetDate(&hrtc, &rtc_date, RTC_FORMAT_BIN);
+
+    /* 显示当前数据 */
+    shell_printf("  LED State: ");
+    for (int i = 0; i < 8; i++) {
+        shell_printf("%d", ucLed[i]);
+    }
+    shell_printf("\r\n");
+
+    shell_printf("  Variables: vara=%d, varb=%d, varc=%d\r\n", vara, varb, varc);
+    shell_printf("  PWM: duty=%.1f%%, freq=%dHz\r\n", pwm_get_duty(), pwm_get_frequency());
+    shell_printf("  RTC: 20%02d-%02d-%02d %02d:%02d:%02d\r\n",
+                 rtc_date.Year, rtc_date.Month, rtc_date.Date,
+                 rtc_time.Hours, rtc_time.Minutes, rtc_time.Seconds);
+
+    /* 执行保存 */
+    if (persist_save() == 0) {
+        shell_printf("Data saved successfully.\r\n");
+    } else {
+        shell_printf("Error: Save failed!\r\n");
+    }
+}
+#endif /* SHELL_CMD_SAVE_ENABLE */
+
+/*===========================================================================*/
+/*                              load 命令实现                                  */
+/*===========================================================================*/
+
+#if SHELL_CMD_LOAD_ENABLE
+/**
+ * @brief   load命令处理函数
+ * @details 从EEPROM加载保存的数据
+ *
+ * @par 使用方法:
+ *      load
+ */
+static void shell_cmd_load(void)
+{
+    RTC_TimeTypeDef rtc_time;
+    RTC_DateTypeDef rtc_date;
+
+    shell_printf("Loading data from EEPROM...\r\n");
+
+    if (persist_load() == 0) {
+        shell_printf("Data loaded successfully.\r\n");
+
+        /* 获取恢复后的RTC时间 */
+        HAL_RTC_GetTime(&hrtc, &rtc_time, RTC_FORMAT_BIN);
+        HAL_RTC_GetDate(&hrtc, &rtc_date, RTC_FORMAT_BIN);
+
+        /* 显示加载后的数据 */
+        shell_printf("  LED State: ");
+        for (int i = 0; i < 8; i++) {
+            shell_printf("%d", ucLed[i]);
+        }
+        shell_printf("\r\n");
+
+        shell_printf("  Variables: vara=%d, varb=%d, varc=%d\r\n", vara, varb, varc);
+        shell_printf("  PWM: duty=%.1f%%, freq=%dHz\r\n", pwm_get_duty(), pwm_get_frequency());
+        shell_printf("  RTC: 20%02d-%02d-%02d %02d:%02d:%02d\r\n",
+                     rtc_date.Year, rtc_date.Month, rtc_date.Date,
+                     rtc_time.Hours, rtc_time.Minutes, rtc_time.Seconds);
+    } else {
+        shell_printf("Error: No valid data found or CRC mismatch!\r\n");
+    }
+}
+#endif /* SHELL_CMD_LOAD_ENABLE */
+
+/*===========================================================================*/
+/*                              factory 命令实现                               */
+/*===========================================================================*/
+
+#if SHELL_CMD_FACTORY_ENABLE
+/**
+ * @brief   factory命令处理函数
+ * @details 恢复出厂设置，清除EEPROM中的保存数据
+ *
+ * @par 使用方法:
+ *      factory
+ */
+static void shell_cmd_factory(void)
+{
+    shell_printf("Factory reset will clear all saved data.\r\n");
+    shell_printf("Resetting to factory defaults...\r\n");
+
+    persist_clear();
+
+    shell_printf("Factory reset complete.\r\n");
+    shell_printf("  LED State: 00000000\r\n");
+    shell_printf("  Variables: vara=0, varb=0, varc=0\r\n");
+    shell_printf("  PWM: duty=50.0%%, freq=1000Hz\r\n");
+    shell_printf("  RTC: 2024-01-01 00:00:00\r\n");
+}
+#endif /* SHELL_CMD_FACTORY_ENABLE */
+
+/*===========================================================================*/
 /*                              命令注册函数                                   */
 /*===========================================================================*/
 
@@ -417,6 +547,18 @@ void shell_cmd_peripheral_init(void)
 
     #if SHELL_CMD_PARASET_ENABLE
     shell_cmd_register("paraset", "Set parameter: paraset <var> <val>", shell_cmd_paraset);
+    #endif
+
+    #if SHELL_CMD_SAVE_ENABLE
+    shell_cmd_register("save", "Save data to EEPROM", shell_cmd_save);
+    #endif
+
+    #if SHELL_CMD_LOAD_ENABLE
+    shell_cmd_register("load", "Load data from EEPROM", shell_cmd_load);
+    #endif
+
+    #if SHELL_CMD_FACTORY_ENABLE
+    shell_cmd_register("factory", "Factory reset", shell_cmd_factory);
     #endif
 #endif
 }

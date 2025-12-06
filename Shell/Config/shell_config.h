@@ -186,6 +186,13 @@ extern "C" {
 #define SHELL_CMD_EEPROM_ENABLE         1   /**< eeprom命令 */
 #define SHELL_CMD_PARASET_ENABLE        1   /**< paraset命令 */
 
+/**
+ * @brief 数据持久化命令模块开关
+ */
+#define SHELL_CMD_SAVE_ENABLE           1   /**< save命令 - 保存数据到EEPROM */
+#define SHELL_CMD_LOAD_ENABLE           1   /**< load命令 - 从EEPROM加载数据 */
+#define SHELL_CMD_FACTORY_ENABLE        1   /**< factory命令 - 恢复出厂设置 */
+
 /*===========================================================================*/
 /*                              动态命令注册配置                               */
 /*===========================================================================*/
