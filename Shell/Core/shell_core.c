@@ -463,23 +463,169 @@ const char *shell_history_get(int index)
 /*===========================================================================*/
 
 #if SHELL_TAB_COMPLETE_ENABLE
+
+/**
+ * @brief   子命令/参数补全表
+ * @details 定义各命令的可补全参数
+ */
+typedef struct {
+    const char *cmd_name;       /**< 主命令名 */
+    const char **sub_cmds;      /**< 子命令列表 */
+    int sub_cmd_count;          /**< 子命令数量 */
+} shell_subcmd_t;
+
+/* led命令的子命令: led <index|all|status> [on|off] */
+static const char *led_sub_cmds[] = {"0", "1", "2", "3", "4", "5", "6", "7", "all", "status", "on", "off"};
+
+/* time命令的子命令: time [set|date] */
+static const char *time_sub_cmds[] = {"set", "date"};
+
+/* eeprom命令的子命令: eeprom <r|w> */
+static const char *eeprom_sub_cmds[] = {"r", "w"};
+
+/* gpio命令的子命令: gpio <port> - 端口A-F */
+static const char *gpio_sub_cmds[] = {"A", "B", "C", "D", "E", "F", "a", "b", "c", "d", "e", "f"};
+
+/* read命令的子命令: read <port> - 端口A-F */
+static const char *read_sub_cmds[] = {"A", "B", "C", "D", "E", "F", "a", "b", "c", "d", "e", "f"};
+
+/* toggle命令的子命令: toggle <index|all> */
+static const char *toggle_sub_cmds[] = {"0", "1", "2", "3", "4", "5", "6", "7", "all"};
+
+/* paraset命令的子命令: paraset <vara|varb|varc> */
+static const char *paraset_sub_cmds[] = {"vara", "varb", "varc"};
+
+/* adc命令的子命令: adc [channel] */
+static const char *adc_sub_cmds[] = {"0", "1"};
+
+/**
+ * @brief   子命令补全表
+ */
+static const shell_subcmd_t shell_subcmd_table[] = {
+    {"led",      led_sub_cmds,      sizeof(led_sub_cmds) / sizeof(char *)},
+    {"time",     time_sub_cmds,     sizeof(time_sub_cmds) / sizeof(char *)},
+    {"eeprom",   eeprom_sub_cmds,   sizeof(eeprom_sub_cmds) / sizeof(char *)},
+    {"gpio",     gpio_sub_cmds,     sizeof(gpio_sub_cmds) / sizeof(char *)},
+    {"read",     read_sub_cmds,     sizeof(read_sub_cmds) / sizeof(char *)},
+    {"toggle",   toggle_sub_cmds,   sizeof(toggle_sub_cmds) / sizeof(char *)},
+    {"paraset",  paraset_sub_cmds,  sizeof(paraset_sub_cmds) / sizeof(char *)},
+    {"adc",      adc_sub_cmds,      sizeof(adc_sub_cmds) / sizeof(char *)},
+};
+
+#define SHELL_SUBCMD_TABLE_SIZE (sizeof(shell_subcmd_table) / sizeof(shell_subcmd_t))
+
+/**
+ * @brief   查找命令的子命令表
+ * @param   cmd_name: 命令名
+ * @return  子命令结构体指针，未找到返回NULL
+ */
+static const shell_subcmd_t *shell_find_subcmd_table(const char *cmd_name)
+{
+    for (int i = 0; i < (int)SHELL_SUBCMD_TABLE_SIZE; i++) {
+        if (strcmp(shell_subcmd_table[i].cmd_name, cmd_name) == 0) {
+            return &shell_subcmd_table[i];
+        }
+    }
+    return NULL;
+}
+
+/**
+ * @brief   获取当前正在输入的单词信息
+ * @param   word_start: 输出当前单词的起始位置
+ * @param   word_len: 输出当前单词的长度
+ * @param   word_index: 输出当前是第几个单词（0=命令名，1=第一个参数...）
+ */
+static void shell_get_current_word(int *word_start, int *word_len, int *word_index)
+{
+    int start = 0;
+    int idx = 0;
+    int i = 0;
+
+    *word_start = 0;
+    *word_len = 0;
+    *word_index = 0;
+
+    /* 遍历命令缓冲区 */
+    while (i < g_shell.cmd_index) {
+        /* 跳过前导空格 */
+        while (i < g_shell.cmd_index && g_shell.cmd_buffer[i] == ' ') {
+            i++;
+        }
+
+        if (i >= g_shell.cmd_index) {
+            /* 光标在空格后面，准备输入新单词 */
+            *word_start = i;
+            *word_len = 0;
+            *word_index = idx;
+            return;
+        }
+
+        /* 记录单词起始位置 */
+        start = i;
+
+        /* 找到单词结束位置 */
+        while (i < g_shell.cmd_index && g_shell.cmd_buffer[i] != ' ') {
+            i++;
+        }
+
+        /* 如果光标在这个单词内或末尾 */
+        if (i == g_shell.cmd_index) {
+            *word_start = start;
+            *word_len = i - start;
+            *word_index = idx;
+            return;
+        }
+
+        idx++;
+    }
+
+    /* 光标在最后，且最后是空格 */
+    *word_start = g_shell.cmd_index;
+    *word_len = 0;
+    *word_index = idx;
+}
+
+/**
+ * @brief   获取第一个单词（命令名）
+ * @param   buf: 输出缓冲区
+ * @param   buf_size: 缓冲区大小
+ */
+static void shell_get_first_word(char *buf, int buf_size)
+{
+    int i = 0;
+    int j = 0;
+
+    /* 跳过前导空格 */
+    while (i < g_shell.cmd_index && g_shell.cmd_buffer[i] == ' ') {
+        i++;
+    }
+
+    /* 复制第一个单词 */
+    while (i < g_shell.cmd_index && g_shell.cmd_buffer[i] != ' ' && j < buf_size - 1) {
+        buf[j++] = g_shell.cmd_buffer[i++];
+    }
+    buf[j] = '\0';
+}
+
 /**
  * @brief   执行TAB自动补全
  *
- * @details 根据当前输入查找匹配的命令：
- *          - 无匹配：不做任何操作
- *          - 单个匹配：直接补全
- *          - 多个匹配：显示所有匹配项
+ * @details 根据当前输入查找匹配的命令或子命令：
+ *          - 如果正在输入命令名（第一个单词），补全命令
+ *          - 如果正在输入参数，补全该命令的子命令/参数
  */
 void shell_tab_complete(void)
 {
-    int match_count = 0;            /* 匹配数量 */
-    const shell_cmd_t *match = NULL; /* 单个匹配时保存命令指针 */
+    int word_start, word_len, word_index;
+    int match_count = 0;
+    const char *match_str = NULL;
     int total_cmds = shell_get_cmd_count();
-    int input_len = g_shell.cmd_index;
+
+    /* 获取当前正在输入的单词信息 */
+    shell_get_current_word(&word_start, &word_len, &word_index);
 
     /* 空输入时显示所有命令 */
-    if (input_len == 0) {
+    if (g_shell.cmd_index == 0) {
         shell_printf("\r\n");
         for (int i = 0; i < total_cmds; i++) {
             const shell_cmd_t *cmd = shell_get_cmd_by_index(i);
@@ -492,45 +638,95 @@ void shell_tab_complete(void)
         return;
     }
 
-    /* 查找所有匹配的命令 */
-    for (int i = 0; i < total_cmds; i++) {
-        const shell_cmd_t *cmd = shell_get_cmd_by_index(i);
-        if (cmd && strncmp(g_shell.cmd_buffer, cmd->name, input_len) == 0) {
-            match = cmd;
-            match_count++;
-        }
-    }
+    if (word_index == 0) {
+        /* 补全命令名（第一个单词） */
+        const shell_cmd_t *match_cmd = NULL;
 
-    /* 根据匹配数量进行处理 */
-    if (match_count == 0) {
-        /* 无匹配，提示音或不做操作 */
-        return;
-    } else if (match_count == 1 && match != NULL) {
-        /* 单个匹配，直接补全 */
-        strcpy(g_shell.cmd_buffer, match->name);
-        g_shell.cmd_index = strlen(g_shell.cmd_buffer);
-
-        /* 添加空格便于输入参数 */
-        if (g_shell.cmd_index < SHELL_CMD_BUFFER_SIZE - 1) {
-            g_shell.cmd_buffer[g_shell.cmd_index++] = ' ';
-            g_shell.cmd_buffer[g_shell.cmd_index] = '\0';
-        }
-
-        /* 清行并显示补全后的内容 */
-        shell_clear_line();
-        shell_printf("%s", g_shell.cmd_buffer);
-    } else {
-        /* 多个匹配，显示所有匹配项 */
-        shell_printf("\r\n");
         for (int i = 0; i < total_cmds; i++) {
             const shell_cmd_t *cmd = shell_get_cmd_by_index(i);
-            if (cmd && strncmp(g_shell.cmd_buffer, cmd->name, input_len) == 0) {
-                shell_printf("%s  ", cmd->name);
+            if (cmd && strncmp(g_shell.cmd_buffer + word_start, cmd->name, word_len) == 0) {
+                match_cmd = cmd;
+                match_str = cmd->name;
+                match_count++;
             }
         }
-        shell_printf("\r\n");
-        shell_show_prompt();
-        shell_printf("%s", g_shell.cmd_buffer);
+
+        if (match_count == 0) {
+            return;  /* 无匹配 */
+        } else if (match_count == 1 && match_cmd != NULL) {
+            /* 单个匹配，直接补全 */
+            strcpy(g_shell.cmd_buffer + word_start, match_cmd->name);
+            g_shell.cmd_index = word_start + strlen(match_cmd->name);
+
+            /* 添加空格 */
+            if (g_shell.cmd_index < SHELL_CMD_BUFFER_SIZE - 1) {
+                g_shell.cmd_buffer[g_shell.cmd_index++] = ' ';
+                g_shell.cmd_buffer[g_shell.cmd_index] = '\0';
+            }
+
+            shell_clear_line();
+            shell_printf("%s", g_shell.cmd_buffer);
+        } else {
+            /* 多个匹配，显示所有 */
+            shell_printf("\r\n");
+            for (int i = 0; i < total_cmds; i++) {
+                const shell_cmd_t *cmd = shell_get_cmd_by_index(i);
+                if (cmd && strncmp(g_shell.cmd_buffer + word_start, cmd->name, word_len) == 0) {
+                    shell_printf("%s  ", cmd->name);
+                }
+            }
+            shell_printf("\r\n");
+            shell_show_prompt();
+            shell_printf("%s", g_shell.cmd_buffer);
+        }
+    } else {
+        /* 补全参数/子命令 */
+        char cmd_name[32];
+        shell_get_first_word(cmd_name, sizeof(cmd_name));
+
+        const shell_subcmd_t *subcmd_table = shell_find_subcmd_table(cmd_name);
+        if (subcmd_table == NULL) {
+            return;  /* 该命令没有子命令表 */
+        }
+
+        /* 当前输入的参数内容 */
+        const char *current_word = g_shell.cmd_buffer + word_start;
+
+        /* 查找匹配的子命令 */
+        for (int i = 0; i < subcmd_table->sub_cmd_count; i++) {
+            if (strncmp(current_word, subcmd_table->sub_cmds[i], word_len) == 0) {
+                match_str = subcmd_table->sub_cmds[i];
+                match_count++;
+            }
+        }
+
+        if (match_count == 0) {
+            return;  /* 无匹配 */
+        } else if (match_count == 1 && match_str != NULL) {
+            /* 单个匹配，补全 */
+            strcpy(g_shell.cmd_buffer + word_start, match_str);
+            g_shell.cmd_index = word_start + strlen(match_str);
+
+            /* 添加空格 */
+            if (g_shell.cmd_index < SHELL_CMD_BUFFER_SIZE - 1) {
+                g_shell.cmd_buffer[g_shell.cmd_index++] = ' ';
+                g_shell.cmd_buffer[g_shell.cmd_index] = '\0';
+            }
+
+            shell_clear_line();
+            shell_printf("%s", g_shell.cmd_buffer);
+        } else {
+            /* 多个匹配，显示所有 */
+            shell_printf("\r\n");
+            for (int i = 0; i < subcmd_table->sub_cmd_count; i++) {
+                if (strncmp(current_word, subcmd_table->sub_cmds[i], word_len) == 0) {
+                    shell_printf("%s  ", subcmd_table->sub_cmds[i]);
+                }
+            }
+            shell_printf("\r\n");
+            shell_show_prompt();
+            shell_printf("%s", g_shell.cmd_buffer);
+        }
     }
 }
 #endif /* SHELL_TAB_COMPLETE_ENABLE */

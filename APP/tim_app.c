@@ -23,16 +23,26 @@ void pwm_set_duty(float Duty)
 void pwm_set_frequency(int Frequency)
 {
     // 获取定时器的时钟频率（假设TIM2使用的时钟频率为TIM2_CLK）
-    uint32_t TIM2_CLK = 72000000;  // 假设72MHz, 需要根据实际情况调整
+    uint32_t TIM2_CLK = 80000000;  // 假设72MHz, 需要根据实际情况调整
+
+    // 保存旧的ARR值，用于计算当前占空比
+    uint32_t old_ARR = TIM2->ARR;
+    uint32_t old_CCR2 = TIM2->CCR2;
 
     // 根据所需频率计算自动重装载寄存器的值
     uint32_t ARR_Value = (TIM2_CLK / Frequency) - 1;
 
+    // 计算当前占空比（使用旧的ARR值）
+    float current_duty = 0.0f;
+    if (old_ARR > 0) {
+        current_duty = (float)old_CCR2 / (float)(old_ARR + 1);
+    }
+
     // 设置自动重装载寄存器
     TIM2->ARR = ARR_Value;
 
-    // 更新捕获/比较寄存器CCR2，保持当前占空比不变
-    TIM2->CCR2 = (ARR_Value + 1) * (TIM2->CCR2 / (float)(TIM2->ARR + 1));
+    // 根据当前占空比计算新的CCR2值
+    TIM2->CCR2 = (uint32_t)((ARR_Value + 1) * current_duty);
 
     // 产生更新事件，刷新寄存器
     TIM2->EGR = TIM_EGR_UG;
@@ -64,7 +74,7 @@ float pwm_get_duty(void)
  */
 int pwm_get_frequency(void)
 {
-    uint32_t TIM2_CLK = 72000000;  // 与pwm_set_frequency保持一致
+    uint32_t TIM2_CLK = 80000000;  // 与pwm_set_frequency保持一致
 
     if (TIM2->ARR == 0) {
         return 0;
