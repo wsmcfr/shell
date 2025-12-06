@@ -17,6 +17,10 @@
 #include "lcd_app.h"
 #include "uart_app.h"
 #include "adc_app.h"
+
+/* 新Shell模块头文件 */
+#include "shell_core.h"
+#include "shell_commands.h"
 #include "rtc_app.h"
 #include "tim_app.h"
 #include "ringbuffer.h"

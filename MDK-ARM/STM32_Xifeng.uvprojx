@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32G431xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32G4xx_HAL_Driver/Inc;../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32G4xx/Include;../Drivers/CMSIS/Include;../APP</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32G4xx_HAL_Driver/Inc;../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32G4xx/Include;../Drivers/CMSIS/Include;../APP;../Shell/Core;../Shell/Config;../Shell/Port;../Shell/Commands</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1248,6 +1248,36 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>Shell</GroupName>
+          <Files>
+            <File>
+              <FileName>shell_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Shell\Core\shell_core.c</FilePath>
+            </File>
+            <File>
+              <FileName>shell_port_stm32g4.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Shell\Port\shell_port_stm32g4.c</FilePath>
+            </File>
+            <File>
+              <FileName>shell_cmd_system.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Shell\Commands\shell_cmd_system.c</FilePath>
+            </File>
+            <File>
+              <FileName>shell_cmd_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Shell\Commands\shell_cmd_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>shell_cmd_peripheral.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Shell\Commands\shell_cmd_peripheral.c</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
   </Targets>
@@ -1257,5 +1287,14 @@
     <components/>
     <files/>
   </RTE>
+
+  <LayerInfo>
+    <Layers>
+      <Layer>
+        <LayName>STM32_Xifeng</LayName>
+        <LayPrjMark>1</LayPrjMark>
+      </Layer>
+    </Layers>
+  </LayerInfo>
 
 </Project>

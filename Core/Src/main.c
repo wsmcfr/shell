@@ -114,7 +114,8 @@ int main(void)
   LCD_SetTextColor(White);
   LCD_SetBackColor(Black);
 
-  shell_init();
+  shell_init();           /* 初始化Shell核心 */
+  shell_commands_init();  /* 注册所有Shell命令 */
   scheduler_init();
   /* USER CODE END 2 */
 
